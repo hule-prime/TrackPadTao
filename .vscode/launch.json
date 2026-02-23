@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:HuyTrackMou}",
+            "name": "Debug TrackPadGiaCay",
+            "target": "TrackPadGiaCay",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug TrackPadGiaCay"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:HuyTrackMou}",
+            "name": "Release TrackPadGiaCay",
+            "target": "TrackPadGiaCay",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release TrackPadGiaCay"
+        }
+    ]
+}
