@@ -119,7 +119,8 @@ cat > "$BUILD_DIR/resources/Welcome.html" << 'WELCOME'
 body { font-family: -apple-system, sans-serif; font-size: 13px; padding: 10px; }
 h2 { color: #1d6ae5; }
 li { margin: 6px 0; }
-code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; }
+.warn { background: #fff8e1; border-left: 3px solid #f59e0b; padding: 8px 12px; border-radius: 4px; margin: 10px 0; }
+.warn b { color: #b45309; }
 </style></head>
 <body>
 <h2>🖱️ TrackPadGiaCay</h2>
@@ -129,6 +130,12 @@ code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; }
   <li>↑ Kéo lên — Mission Control</li>
   <li>↓ Kéo xuống — Show Desktop</li>
 </ul>
+<div class="warn">
+  <b>⚠️ Nếu macOS báo "Not Opened" / không xác minh được:</b><br>
+  Đừng double-click — hãy <b>Right-click (hoặc Control+click)</b> vào file .pkg → chọn <b>Open</b> → nhấn <b>Open</b> trong hộp thoại.<br>
+  <br>
+  Hoặc: <b>System Settings → Privacy &amp; Security</b> → kéo xuống → nhấn <b>"Open Anyway"</b>.
+</div>
 <p><b>Sau khi cài xong:</b> Cấp quyền <b>Accessibility</b> trong System Settings khi được yêu cầu.</p>
 </body>
 </html>
