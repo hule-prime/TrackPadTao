@@ -4,6 +4,12 @@
 
 A lightweight macOS menu bar utility that maps middle mouse button drag gestures to system actions — switch apps by MRU history, trigger Mission Control, Show Desktop, change Spaces, and more.
 
+<p align="center">
+  <img src="screenshots/settings-gestures.png" width="280" alt="Gestures tab"/>
+  <img src="screenshots/settings-permissions.png" width="280" alt="Permissions tab"/>
+  <img src="screenshots/settings-language.png" width="280" alt="Language tab"/>
+</p>
+
 ---
 
 ## Features
@@ -123,6 +129,12 @@ MIT — free to use, modify, and distribute.
 **[English](#️-trackpadgiacay)** | **VI**
 
 Tiện ích menu bar macOS nhỏ gọn, ánh xạ cử chỉ kéo chuột giữa thành các thao tác hệ thống — chuyển app theo lịch sử MRU, Mission Control, Show Desktop, chuyển Space, và nhiều hơn nữa.
+
+<p align="center">
+  <img src="screenshots/settings-gestures.png" width="280" alt="Tab Cử chỉ"/>
+  <img src="screenshots/settings-permissions.png" width="280" alt="Tab Quyền"/>
+  <img src="screenshots/settings-language.png" width="280" alt="Tab Ngôn ngữ"/>
+</p>
 
 ---
 
