@@ -12,3 +12,4 @@ DerivedData/
 *.perspectivev3
 *.zip
 dist/
+*.pkg
