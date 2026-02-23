@@ -73,9 +73,11 @@ final class GestureEngine {
 
     // MARK: - Event handler
     private func handle(type: CGEventType, event: CGEvent) {
+        let btn = Int(event.getIntegerValueField(.mouseEventButtonNumber))
+        let triggerBtn = GestureConfigStore.shared.config.triggerButton.rawValue
         switch type {
         case .otherMouseDown:
-            if event.getIntegerValueField(.mouseEventButtonNumber) == 2 {
+            if btn == triggerBtn {
                 isMiddleDown = true
                 hasFired = false
                 startX = event.location.x
@@ -83,7 +85,7 @@ final class GestureEngine {
             }
 
         case .otherMouseUp:
-            if event.getIntegerValueField(.mouseEventButtonNumber) == 2 {
+            if btn == triggerBtn {
                 isMiddleDown = false
                 hasFired = false
             }

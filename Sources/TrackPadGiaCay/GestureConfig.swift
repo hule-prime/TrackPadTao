@@ -30,14 +30,46 @@ enum GestureAction: String, CaseIterable, Codable, Identifiable {
     }
 }
 
+// MARK: - Trigger button
+enum TriggerButton: Int, CaseIterable, Codable, Identifiable {
+    case middle   = 2
+    case side1    = 3   // nút hông trái / back
+    case side2    = 4   // nút hông phải / forward
+    case button5  = 5
+    case button6  = 6
+
+    var id: Int { rawValue }
+
+    var label: String {
+        switch self {
+        case .middle:  return "Chuột giữa (Button 3)"
+        case .side1:   return "Nút hông trái / Back (Button 4)"
+        case .side2:   return "Nút hông phải / Forward (Button 5)"
+        case .button5: return "Button 6"
+        case .button6: return "Button 7"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .middle:  return "computermouse.fill"
+        case .side1:   return "arrow.backward.circle.fill"
+        case .side2:   return "arrow.forward.circle.fill"
+        default:       return "button.programmable"
+        }
+    }
+}
+
 // MARK: - Config model
 struct GestureConfig: Codable, Equatable {
-    var dragLeft:  GestureAction = .switchPrevApp
-    var dragRight: GestureAction = .switchNextApp
-    var dragUp:    GestureAction = .missionControl
-    var dragDown:  GestureAction = .showDesktop
+    var dragLeft:     GestureAction = .switchPrevApp
+    var dragRight:    GestureAction = .switchNextApp
+    var dragUp:       GestureAction = .missionControl
+    var dragDown:     GestureAction = .showDesktop
+    /// Nút chuột dùng để kích hoạt gesture
+    var triggerButton: TriggerButton = .middle
     /// Khoảng cách tối thiểu (pixel) để trigger gesture
-    var threshold: Double = 80.0
+    var threshold:    Double = 80.0
     var launchAtLogin: Bool = false
 }
 

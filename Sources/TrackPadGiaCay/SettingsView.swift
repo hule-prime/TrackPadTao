@@ -218,6 +218,31 @@ struct SettingsView: View {
 
                         Divider()
 
+                        // Trigger button
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Trigger Button", systemImage: "computermouse")
+                                .font(.subheadline.bold())
+                                .foregroundStyle(.secondary)
+
+                            HStack(spacing: 10) {
+                                Text("Nút kích hoạt:")
+                                    .foregroundStyle(.secondary)
+                                    .font(.callout)
+                                Picker("", selection: $store.config.triggerButton) {
+                                    ForEach(TriggerButton.allCases) { btn in
+                                        Label(btn.label, systemImage: btn.icon)
+                                            .tag(btn)
+                                    }
+                                }
+                                .labelsHidden()
+                                .frame(maxWidth: .infinity)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
+
+                        Divider()
+
                         // Threshold
                         VStack(alignment: .leading, spacing: 8) {
                             Label("Sensitivity", systemImage: "slider.horizontal.3")
@@ -275,6 +300,6 @@ struct SettingsView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
         }
-        .frame(width: 500, height: 480)
+        .frame(width: 500, height: 540)
     }
 }
