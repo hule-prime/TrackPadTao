@@ -1,19 +1,61 @@
 import Foundation
 import SwiftUI
 
+// MARK: - Language
+enum AppLanguage: String, CaseIterable, Codable, Identifiable {
+    case vietnamese = "vi"
+    case english    = "en"
+    var id: String { rawValue }
+    var displayName: String {
+        switch self {
+        case .vietnamese: return "🇻🇳  Tiếng Việt"
+        case .english:    return "🇺🇸  English"
+        }
+    }
+}
+
 // MARK: - Actions
 enum GestureAction: String, CaseIterable, Codable, Identifiable {
-    case none              = "Không làm gì"
-    case switchPrevApp     = "← App trước (MRU)"
-    case switchNextApp     = "→ App tiếp (MRU)"
-    case missionControl    = "Mission Control"
-    case appExpose         = "App Exposé"
-    case showDesktop       = "Show Desktop"
-    case launchpad         = "Launchpad"
-    case switchSpaceLeft   = "Chuyển Space ←"
-    case switchSpaceRight  = "Chuyển Space →"
+    case none              = "none"
+    case switchPrevApp     = "switchPrevApp"
+    case switchNextApp     = "switchNextApp"
+    case missionControl    = "missionControl"
+    case appExpose         = "appExpose"
+    case showDesktop       = "showDesktop"
+    case launchpad         = "launchpad"
+    case switchSpaceLeft   = "switchSpaceLeft"
+    case switchSpaceRight  = "switchSpaceRight"
 
     var id: String { rawValue }
+
+    func displayName(lang: AppLanguage) -> String {
+        switch lang {
+        case .english:
+            switch self {
+            case .none:             return "Do Nothing"
+            case .switchPrevApp:    return "← Previous App (MRU)"
+            case .switchNextApp:    return "→ Next App (MRU)"
+            case .missionControl:   return "Mission Control"
+            case .appExpose:        return "App Exposé"
+            case .showDesktop:      return "Show Desktop"
+            case .launchpad:        return "Launchpad"
+            case .switchSpaceLeft:  return "Switch Space ←"
+            case .switchSpaceRight: return "Switch Space →"
+            }
+        case .vietnamese:
+            switch self {
+            case .none:             return "Không làm gì"
+            case .switchPrevApp:    return "← App trước (MRU)"
+            case .switchNextApp:    return "→ App tiếp (MRU)"
+            case .missionControl:   return "Mission Control"
+            case .appExpose:        return "App Exposé"
+            case .showDesktop:      return "Show Desktop"
+            case .launchpad:        return "Launchpad"
+            case .switchSpaceLeft:  return "Chuyển Space ←"
+            case .switchSpaceRight: return "Chuyển Space →"
+            }
+        }
+    }
 
     var icon: String {
         switch self {
@@ -40,13 +82,24 @@ enum TriggerButton: Int, CaseIterable, Codable, Identifiable {
 
     var id: Int { rawValue }
 
-    var label: String {
-        switch self {
-        case .middle:  return "Chuột giữa (Button 3)"
-        case .side1:   return "Nút hông trái / Back (Button 4)"
-        case .side2:   return "Nút hông phải / Forward (Button 5)"
-        case .button5: return "Button 6"
-        case .button6: return "Button 7"
+    func label(lang: AppLanguage) -> String {
+        switch lang {
+        case .english:
+            switch self {
+            case .middle:  return "Middle Mouse (Button 3)"
+            case .side1:   return "Left Side / Back (Button 4)"
+            case .side2:   return "Right Side / Forward (Button 5)"
+            case .button5: return "Button 6"
+            case .button6: return "Button 7"
+            }
+        case .vietnamese:
+            switch self {
+            case .middle:  return "Chuột giữa (Button 3)"
+            case .side1:   return "Nút hông trái / Back (Button 4)"
+            case .side2:   return "Nút hông phải / Forward (Button 5)"
+            case .button5: return "Button 6"
+            case .button6: return "Button 7"
+            }
         }
     }
 
@@ -71,6 +124,7 @@ struct GestureConfig: Codable, Equatable {
     /// Khoảng cách tối thiểu (pixel) để trigger gesture
     var threshold:    Double = 80.0
     var launchAtLogin: Bool = false
+    var language: AppLanguage = .vietnamese
 }
 
 // MARK: - Persistence

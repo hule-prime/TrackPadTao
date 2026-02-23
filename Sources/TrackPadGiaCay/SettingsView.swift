@@ -5,6 +5,7 @@ import ApplicationServices
 struct GestureRow: View {
     let label: String
     let icon: String
+    let lang: AppLanguage
     @Binding var action: GestureAction
 
     var body: some View {
@@ -23,7 +24,7 @@ struct GestureRow: View {
                 ForEach(GestureAction.allCases) { a in
                     HStack {
                         Image(systemName: a.icon)
-                        Text(a.rawValue)
+                        Text(a.displayName(lang: lang))
                     }
                     .tag(a)
                 }
@@ -43,10 +44,11 @@ struct PermissionRow: View {
     let granted: Bool
     let settingsURL: String
     let buttonLabel: String
+    let grantedText: String
+    let notGrantedText: String
 
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
-            // Status icon
             ZStack {
                 Circle()
                     .fill(granted ? Color.green.opacity(0.15) : Color.orange.opacity(0.15))
@@ -63,7 +65,7 @@ struct PermissionRow: View {
                     Image(systemName: granted ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
                         .foregroundStyle(granted ? .green : .orange)
                         .font(.callout)
-                    Text(granted ? "Đã cấp" : "Chưa cấp")
+                    Text(granted ? grantedText : notGrantedText)
                         .font(.caption)
                         .foregroundStyle(granted ? .green : .orange)
                 }
@@ -111,33 +113,44 @@ struct PermissionRow: View {
 
 // MARK: - Permissions tab
 struct PermissionsView: View {
+    let lang: AppLanguage
     @State private var accessibilityGranted = AXIsProcessTrusted()
     @State private var inputMonitoringGranted = GestureEngine.shared.isRunning
     @State private var timer: Timer? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Cần cấp đủ 1 quyền bắt buộc bên dưới để gesture hoạt động.")
+            Text(lang == .english
+                 ? "At least 1 required permission must be granted for gestures to work."
+                 : "Cần cấp đủ 1 quyền bắt buộc bên dưới để gesture hoạt động.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.bottom, 2)
 
             PermissionRow(
                 title: "Accessibility",
-                description: "Bắt buộc — theo dõi chuột giữa và chuyển app.",
+                description: lang == .english
+                    ? "Required — track middle mouse button and switch apps."
+                    : "Bắt buộc — theo dõi chuột giữa và chuyển app.",
                 icon: "figure.walk.circle",
                 granted: accessibilityGranted,
                 settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
-                buttonLabel: "Mở Accessibility Settings"
+                buttonLabel: lang == .english ? "Open Accessibility Settings" : "Mở Accessibility Settings",
+                grantedText: lang == .english ? "Granted" : "Đã cấp",
+                notGrantedText: lang == .english ? "Not Granted" : "Chưa cấp"
             )
 
             PermissionRow(
                 title: "Input Monitoring",
-                description: "Tùy chọn — nếu chuột giữa của bạn không detect được.",
+                description: lang == .english
+                    ? "Optional — if your middle mouse button is not detected."
+                    : "Tùy chọn — nếu chuột giữa của bạn không detect được.",
                 icon: "keyboard",
                 granted: inputMonitoringGranted,
                 settingsURL: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent",
-                buttonLabel: "Mở Input Monitoring Settings"
+                buttonLabel: lang == .english ? "Open Input Monitoring Settings" : "Mở Input Monitoring Settings",
+                grantedText: lang == .english ? "Granted" : "Đã cấp",
+                notGrantedText: lang == .english ? "Not Granted" : "Chưa cấp"
             )
 
             Spacer()
@@ -145,7 +158,7 @@ struct PermissionsView: View {
             HStack(spacing: 4) {
                 Image(systemName: "arrow.clockwise.circle")
                     .foregroundStyle(.secondary)
-                Text("Tự động cập nhật mỗi 2 giây.")
+                Text(lang == .english ? "Auto-refreshes every 2 seconds." : "Tự động cập nhật mỗi 2 giây.")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -153,9 +166,7 @@ struct PermissionsView: View {
         .padding(20)
         .onAppear {
             refreshAll()
-            timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
-                refreshAll()
-            }
+            timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in refreshAll() }
         }
         .onDisappear {
             timer?.invalidate()
@@ -169,14 +180,50 @@ struct PermissionsView: View {
     }
 }
 
+// MARK: - Language tab
+struct LanguageView: View {
+    @ObservedObject private var store = GestureConfigStore.shared
+
+    var body: some View {
+        let lang = store.config.language
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 14) {
+                Label(lang == .english ? "App Language" : "Ngôn ngữ ứng dụng",
+                      systemImage: "globe")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.secondary)
+
+                Picker("", selection: $store.config.language) {
+                    ForEach(AppLanguage.allCases) { l in
+                        Text(l.displayName).tag(l)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+
+                Text(lang == .english
+                     ? "Changes apply immediately to all interface text."
+                     : "Thay đổi được áp dụng ngay cho toàn bộ giao diện.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(20)
+
+            Spacer()
+        }
+    }
+}
+
 // MARK: - Main settings view
 struct SettingsView: View {
     @ObservedObject private var store = GestureConfigStore.shared
 
     var body: some View {
+        let lang = store.config.language
+
         VStack(alignment: .leading, spacing: 0) {
 
-            // ── Header ──────────────────────────────────────────────────
+            // Header
             HStack(spacing: 10) {
                 Image(systemName: "computermouse.fill")
                     .font(.system(size: 28))
@@ -184,7 +231,9 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("TrackPadGiaCay")
                         .font(.headline)
-                    Text("Middle mouse gesture settings")
+                    Text(lang == .english
+                         ? "Middle mouse gesture settings"
+                         : "Cài đặt cử chỉ chuột giữa")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -196,41 +245,55 @@ struct SettingsView: View {
 
             Divider()
 
-            // ── Tabs ────────────────────────────────────────────────────
+            // Tabs
             TabView {
+
                 // Tab 1: Gestures
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        // Gestures
+
                         VStack(alignment: .leading, spacing: 6) {
-                            Label("Gestures", systemImage: "hand.draw.fill")
+                            Label(lang == .english ? "Gestures" : "Cử chỉ",
+                                  systemImage: "hand.draw.fill")
                                 .font(.subheadline.bold())
                                 .foregroundStyle(.secondary)
                                 .padding(.bottom, 4)
 
-                            GestureRow(label: "← Kéo trái",  icon: "arrow.left",  action: $store.config.dragLeft)
-                            GestureRow(label: "→ Kéo phải",  icon: "arrow.right", action: $store.config.dragRight)
-                            GestureRow(label: "↑ Kéo lên",   icon: "arrow.up",    action: $store.config.dragUp)
-                            GestureRow(label: "↓ Kéo xuống", icon: "arrow.down",  action: $store.config.dragDown)
+                            GestureRow(
+                                label: lang == .english ? "← Drag Left"  : "← Kéo trái",
+                                icon: "arrow.left",  lang: lang,
+                                action: $store.config.dragLeft)
+                            GestureRow(
+                                label: lang == .english ? "→ Drag Right" : "→ Kéo phải",
+                                icon: "arrow.right", lang: lang,
+                                action: $store.config.dragRight)
+                            GestureRow(
+                                label: lang == .english ? "↑ Drag Up"    : "↑ Kéo lên",
+                                icon: "arrow.up",    lang: lang,
+                                action: $store.config.dragUp)
+                            GestureRow(
+                                label: lang == .english ? "↓ Drag Down"  : "↓ Kéo xuống",
+                                icon: "arrow.down",  lang: lang,
+                                action: $store.config.dragDown)
                         }
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
 
                         Divider()
 
-                        // Trigger button
                         VStack(alignment: .leading, spacing: 8) {
-                            Label("Trigger Button", systemImage: "computermouse")
+                            Label(lang == .english ? "Trigger Button" : "Nút kích hoạt",
+                                  systemImage: "computermouse")
                                 .font(.subheadline.bold())
                                 .foregroundStyle(.secondary)
 
                             HStack(spacing: 10) {
-                                Text("Nút kích hoạt:")
+                                Text(lang == .english ? "Button:" : "Nút kích hoạt:")
                                     .foregroundStyle(.secondary)
                                     .font(.callout)
                                 Picker("", selection: $store.config.triggerButton) {
                                     ForEach(TriggerButton.allCases) { btn in
-                                        Label(btn.label, systemImage: btn.icon)
+                                        Label(btn.label(lang: lang), systemImage: btn.icon)
                                             .tag(btn)
                                     }
                                 }
@@ -243,14 +306,14 @@ struct SettingsView: View {
 
                         Divider()
 
-                        // Threshold
                         VStack(alignment: .leading, spacing: 8) {
-                            Label("Sensitivity", systemImage: "slider.horizontal.3")
+                            Label(lang == .english ? "Sensitivity" : "Độ nhạy",
+                                  systemImage: "slider.horizontal.3")
                                 .font(.subheadline.bold())
                                 .foregroundStyle(.secondary)
 
                             HStack(spacing: 10) {
-                                Text("Cần kéo xa:")
+                                Text(lang == .english ? "Drag distance:" : "Cần kéo xa:")
                                     .foregroundStyle(.secondary)
                                     .font(.callout)
                                 Slider(value: $store.config.threshold, in: 30...250, step: 5)
@@ -265,9 +328,9 @@ struct SettingsView: View {
 
                         Divider()
 
-                        // Launch at login
                         Toggle(isOn: $store.config.launchAtLogin) {
-                            Label("Tự khởi động cùng hệ thống", systemImage: "power.circle")
+                            Label(lang == .english ? "Launch at Login" : "Tự khởi động cùng hệ thống",
+                                  systemImage: "power.circle")
                                 .font(.callout)
                         }
                         .toggleStyle(.switch)
@@ -278,19 +341,28 @@ struct SettingsView: View {
                         }
                     }
                 }
-                .tabItem { Label("Gestures", systemImage: "hand.draw.fill") }
+                .tabItem {
+                    Label(lang == .english ? "Gestures" : "Cử chỉ", systemImage: "hand.draw.fill")
+                }
 
                 // Tab 2: Permissions
-                PermissionsView()
-                    .tabItem { Label("Permissions", systemImage: "lock.shield.fill") }
+                PermissionsView(lang: lang)
+                    .tabItem {
+                        Label(lang == .english ? "Permissions" : "Quyền", systemImage: "lock.shield.fill")
+                    }
+
+                // Tab 3: Language
+                LanguageView()
+                    .tabItem {
+                        Label(lang == .english ? "Language" : "Ngôn ngữ", systemImage: "globe")
+                    }
             }
 
             Divider()
 
-            // ── Footer ───────────────────────────────────────────────────
             HStack {
                 Spacer()
-                Button("Quit TrackPadGiaCay") {
+                Button(lang == .english ? "Quit TrackPadGiaCay" : "Thoát TrackPadGiaCay") {
                     NSApplication.shared.terminate(nil)
                 }
                 .buttonStyle(.borderedProminent)
@@ -300,6 +372,6 @@ struct SettingsView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
         }
-        .frame(width: 500, height: 540)
+        .frame(width: 500, height: 560)
     }
 }
